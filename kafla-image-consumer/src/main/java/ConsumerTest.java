@@ -1,13 +1,8 @@
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
+import org.apache.commons.io.IOUtils;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
+import java.io.*;
 
 
 public class ConsumerTest implements Runnable {
@@ -26,11 +21,10 @@ public class ConsumerTest implements Runnable {
             i++;
             System.out.println("get image");
 
-            BufferedImage img = null;
             try {
-                img = ImageIO.read(new ByteArrayInputStream(it.next().message()));
-                File outputfile = new File("d:/result/"+i+".jpg");
-                ImageIO.write(img,"jpg",outputfile);
+                FileOutputStream output = new FileOutputStream(new File("d:/result/"+i+".jpg"));
+                IOUtils.write(it.next().message(), output);
+                output.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -2,19 +2,17 @@ package org.nchc.bigdata.kafka_avro;
 
 import kafka.serializer.Encoder;
 import kafka.utils.VerifiableProperties;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.WritableRaster;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created by 1403035 on 2014/7/11.
  */
-public class ImageEncoder implements Encoder<BufferedImage> {
+public class ImageEncoder implements Encoder<FileInputStream> {
 
+    private static Logger logger = Logger.getLogger(ImageEncoder.class);
     public ImageEncoder(VerifiableProperties verifiableProperties) {
         /* This constructor must be present for successful compile. */
     }
@@ -22,30 +20,14 @@ public class ImageEncoder implements Encoder<BufferedImage> {
     public ImageEncoder(){}
 
     @Override
-    public byte[] toBytes(BufferedImage bufferedImage) {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    public byte[] toBytes(FileInputStream fis) {
         try {
-            ImageIO.write(bufferedImage, "jpg", baos);
-            baos.flush();
-            return baos.toByteArray();
-
+            return IOUtils.toByteArray(fis);
         } catch (IOException e) {
-            return null;
-        } finally {
-            try {
-                baos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+            logger.error(errors.toString());
         }
-
-
-
-        /*
-        WritableRaster raster = bufferedImage .getRaster();
-        DataBufferByte data   = (DataBufferByte) raster.getDataBuffer();
-        return ( data.getData() );
-        */
+        return null;
     }
 }

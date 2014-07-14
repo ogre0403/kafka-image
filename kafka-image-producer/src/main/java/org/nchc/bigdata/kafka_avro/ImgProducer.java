@@ -13,13 +13,14 @@ import org.apache.avro.generic.GenericRecord;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
+import org.apache.commons.io.IOUtils;
 
 import javax.imageio.ImageIO;
 
 
 public class ImgProducer
 {
-    private static Producer<Integer, BufferedImage> producer;
+    private static Producer<Integer, FileInputStream> producer;
     private final Properties props = new Properties();
     private String topic = "DUMMY_LOG";
     private ImageEncoder encoder;
@@ -30,15 +31,14 @@ public class ImgProducer
         props.put("serializer.class", "org.nchc.bigdata.kafka_avro.ImageEncoder");
 //        props.put("max.message.size","100000000");
         //props.put("request.required.acks", "1");
-        producer = new Producer<Integer, BufferedImage>(new ProducerConfig(props));
+        producer = new Producer<Integer, FileInputStream>(new ProducerConfig(props));
         encoder = new ImageEncoder();
     }
 
     public static void main(String[] args) throws IOException {
 
         ImgProducer ap = new ImgProducer();
-//        ap.resource();
-        File folder = new File("/D:/big");
+        File folder = new File("/D:/kafka_image");
         ap.sendImageInDir(folder);
         ap.close();
 
@@ -59,24 +59,19 @@ public class ImgProducer
 
     private void sendImage(String imgFileName) throws IOException {
 
-        File imgPath = new File(imgFileName);
-        BufferedImage bufferedImage = ImageIO.read(imgPath);
-        KeyedMessage<Integer, BufferedImage> data =
-                new KeyedMessage<Integer, BufferedImage> (topic, bufferedImage);
+        FileInputStream fis = new FileInputStream(imgFileName);
+        KeyedMessage<Integer, FileInputStream> data =
+                new KeyedMessage<Integer, FileInputStream> (topic, fis);
         producer.send(data);
         System.out.println(imgFileName);
     }
 
     private void saveToDisk(String imgFileName) throws IOException {
-
-        File imgPath = new File(imgFileName);
-        BufferedImage bufferedImage = ImageIO.read(imgPath);
-        byte[] ba = encoder.toBytes(bufferedImage);
-
-        BufferedImage img = ImageIO.read(new ByteArrayInputStream(ba));
-        File outputfile = new File("d:/result/aaa.jpg");
-        ImageIO.write(img,"jpg",outputfile);
-
+        FileInputStream imgPath = new FileInputStream(imgFileName);
+        byte[] ba = encoder.toBytes(imgPath);
+        FileOutputStream output = new FileOutputStream(new File("/D:/result/aaa.JPG"));
+        IOUtils.write(ba, output);
+        output.close();
     }
 
     public void close(){
