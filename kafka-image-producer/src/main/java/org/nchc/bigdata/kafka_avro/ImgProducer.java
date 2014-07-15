@@ -1,21 +1,11 @@
 package org.nchc.bigdata.kafka_avro;
 
-import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URL;
 import java.util.Properties;
-
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericRecord;
-
-
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.apache.commons.io.IOUtils;
-
-import javax.imageio.ImageIO;
 
 
 public class ImgProducer

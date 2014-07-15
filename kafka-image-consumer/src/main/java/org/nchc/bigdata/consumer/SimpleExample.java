@@ -1,4 +1,4 @@
-/**
+package org.nchc.bigdata.consumer; /**
  * Created by 1403035 on 2014/7/11.
  */
 import kafka.api.FetchRequest;

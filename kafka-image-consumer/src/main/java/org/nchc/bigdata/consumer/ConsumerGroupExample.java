@@ -1,3 +1,4 @@
+package org.nchc.bigdata.consumer;
 
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
