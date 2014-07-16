@@ -12,7 +12,7 @@ public class ImgProducer
 {
     private static Producer<Integer, FileInputStream> producer;
     private final Properties props = new Properties();
-    private String topic = "DUMMY_LOG";
+    private String topic = "binary.test";
     private ImageEncoder encoder;
 
     public ImgProducer(){

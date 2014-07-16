@@ -63,7 +63,7 @@ public class ConsumerGroupExample {
     public static void main(String[] args) {
         String zooKeeper = "master:2181";
         String groupId = "TEST";
-        String topic = "DUMMY_LOG";
+        String topic = "binary.test";
         int threads = Integer.parseInt("1");
 
         ConsumerGroupExample example = new ConsumerGroupExample(zooKeeper, groupId, topic);

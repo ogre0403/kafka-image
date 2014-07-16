@@ -64,7 +64,7 @@ public class HDFSConsumer {
         writer.append(key,value);
     }
     private static void readFromSeqFile(Configuration conf) throws IOException {
-        Path pp = new Path("/out/image.seq");
+        Path pp = new Path("/camus_bin/output/binary_test/hourly/2014/07/15/19/binary_test.1.1.4.3seq");
         FileSystem fs = FileSystem.get(conf);
         SequenceFile.Reader reader =  new SequenceFile.Reader(fs, pp,conf);
         Writable key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
