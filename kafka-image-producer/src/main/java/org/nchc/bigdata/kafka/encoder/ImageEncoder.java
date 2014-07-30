@@ -1,4 +1,4 @@
-package org.nchc.bigdata.kafka_avro;
+package org.nchc.bigdata.kafka.encoder;
 
 import kafka.serializer.Encoder;
 import kafka.utils.VerifiableProperties;

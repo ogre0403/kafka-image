@@ -2,11 +2,18 @@ package org.nchc.bigdata.consumer;
 
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.Decoder;
+import org.apache.avro.io.DecoderFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 
 
 public class ConsumerTest implements Runnable {
@@ -14,6 +21,7 @@ public class ConsumerTest implements Runnable {
     private int m_threadNumber;
     private Configuration conf;
     private FileSystem fs;
+    private DatumReader<GenericRecord> datumReader;
 
     public ConsumerTest(KafkaStream a_stream, int a_threadNumber) {
         m_threadNumber = a_threadNumber;
@@ -25,10 +33,21 @@ public class ConsumerTest implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        File file3 = new File(ConsumerTest.class.getResource("/image.avsc").getFile());
+        Schema schema = null;
+        try {
+            schema = Schema.parse(file3);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        datumReader = new GenericDatumReader<GenericRecord>(schema);
+
     }
 
     public void run() {
         int i = 0;
+
         ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
         while (it.hasNext()) {
             i++;
@@ -36,16 +55,26 @@ public class ConsumerTest implements Runnable {
 
             try {
 
+                // write to HDFS
+                /*
                 Path out = new Path("/out/result_"+i+".jpg");
                 OutputStream os = fs.create(out);
                 ByteArrayInputStream is = new ByteArrayInputStream(it.next().message());
                 org.apache.hadoop.io.IOUtils.copyBytes(is, os, conf);
-
-                /*
-                FileOutputStream output = new FileOutputStream(new File("d:/result/"+i+".jpg"));
-                IOUtils.write(it.next().message(), output);
-                output.close();
                 */
+
+                // write to local disk
+
+                Decoder decoder = DecoderFactory.get().binaryDecoder(it.next().message(),null);
+                GenericRecord rr = datumReader.read(null,decoder);
+                FileOutputStream output = new FileOutputStream(new File("d:/result/"+rr.get("filename")));
+                ByteBuffer bf = (ByteBuffer)rr.get("raw");
+                byte[] ba = new byte[bf.capacity()];
+                bf.get(ba,0,ba.length);
+                IOUtils.write(ba, output);
+                output.close();
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
