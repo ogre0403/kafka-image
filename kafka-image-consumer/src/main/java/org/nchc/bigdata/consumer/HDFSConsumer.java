@@ -64,19 +64,19 @@ public class HDFSConsumer {
         writer.append(key,value);
     }
     private static void readFromSeqFile(Configuration conf) throws IOException {
-        Path pp = new Path("/camus_bin/output/binary_test/hourly/2014/07/15/19/binary_test.1.1.4.3seq");
+        Path pp = new Path("/camus_bin/output/binary_test/hourly/2014/07/31/10/binary_test.1.0.4.3.seq");
         FileSystem fs = FileSystem.get(conf);
         SequenceFile.Reader reader =  new SequenceFile.Reader(fs, pp,conf);
         Writable key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
         Writable value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(),conf);
         int i = 0;
         while(reader.next(key,value)){
-            System.out.println(i++);
             int sss = ((BytesWritable) value).getLength();
             byte[] ba = new byte[sss];
             System.arraycopy(((BytesWritable) value).getBytes(),0,ba,0,sss);
 
-            FileOutputStream output = new FileOutputStream(new File("d:/result/"+i+".jpg"));
+            System.out.println(key.toString());
+            FileOutputStream output = new FileOutputStream(new File("d:/result/"+key.toString()));
             org.apache.commons.io.IOUtils.write(ba, output);
             output.close();
         }
